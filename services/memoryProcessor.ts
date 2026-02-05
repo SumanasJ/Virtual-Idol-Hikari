@@ -31,37 +31,40 @@ export const recordConversationMemory = async (
   assistantMessage: string,
   simulatedTime: string
 ): Promise<void> => {
-  const prompt = `你是一个轻量级的记录助手。从对话中识别**真正重要**的信息。
+  const prompt = `你是一个记录助手。从对话中识别有用的信息。
 
 对话：
 用户：${userMessage}
 光：${assistantMessage}
 
-【记录标准】只记录以下类型：
-1. **长期偏好**：明确的喜好、厌恶、习惯（如"讨厌香菜"、"喜欢早上跑步"）
-2. **重要事实**：用户的基本信息、重要事件
-3. **光的重要事项**：光自己的重要决定、目标
+【记录标准】记录以下类型：
+1. **偏好兴趣**：喜好、厌恶、兴趣、爱好（如"喜欢猫"、"讨厌香菜"）
+2. **生活习惯**：日常习惯、作息时间、工作学习（如"早上跑步"、"晚上熬夜"）
+3. **重要信息**：用户的基本信息、经历、家庭、朋友
+4. **光的信息**：光自己的事情、想法、经历
+5. **共同话题**：可以聊天的内容（如"都喜欢猫"、"都爱听音乐"）
 
 【不要记录】
-- 闲聊、日常琐事
-- 暂时想法、短期计划
-- 吃什么、穿什么等小事
-- 已经说过的重复内容
-- 问候语、客套话
+- 纯粹的问候（你好、早安）
+- 重复的内容
+- 没有实际意义的对话
 
 【要求】
-- 每次最多1条
-- 10-15字
-- 宁可不记录，也不要记录琐事
+- 每次最多2条
+- 8-20字
 
 返回JSON格式：
 {
-  "fact": "重要的偏好或事实（10-15字）",
-  "category": "userinfo|hikari_info",
-  "importance": 0.1-1.0
+  "facts": [
+    {
+      "fact": "具体的记忆内容",
+      "category": "userinfo|hikari_info|shared_event",
+      "importance": 0.3-1.0
+    }
+  ]
 }
 
-如果没有重要信息，返回 null`;
+如果没有有价值的信息，返回 {"facts": []}`;
 
   try {
     const response = await ai.models.generateContent({
@@ -70,25 +73,38 @@ export const recordConversationMemory = async (
       config: { responseMimeType: 'application/json' }
     });
 
-    const result = JSON.parse(response.text || '{}');
+    const result = JSON.parse(response.text || '{"facts": []}');
 
-    // 只记录重要事实，且去重
-    if (result.fact) {
-      // 检查是否重复
-      const isDuplicate = await isDuplicateMemory(result.fact);
-      if (isDuplicate) {
-        console.log('⚠️ 记忆已存在，跳过记录');
-        return;
+    // 记录所有事实
+    if (result.facts && result.facts.length > 0) {
+      let recordedCount = 0;
+      for (const factData of result.facts) {
+        if (!factData.fact) continue;
+
+        // 检查是否重复
+        const isDuplicate = await isDuplicateMemory(factData.fact);
+        if (isDuplicate) {
+          console.log(`⚠️ 记忆已存在，跳过: ${factData.fact}`);
+          continue;
+        }
+
+        await addMemoryFact({
+          fact: factData.fact,
+          category: factData.category || 'shared_event',
+          type: 'short_term',
+          importance: factData.importance || 0.6,
+          source: 'conversation'
+        });
+        recordedCount++;
       }
 
-      await addMemoryFact({
-        fact: result.fact,
-        category: result.category || 'shared_event',
-        type: 'short_term',
-        importance: result.importance || 0.6,
-        source: 'conversation'
-      });
-      console.log('📝 记录了 1 条重要信息');
+      if (recordedCount > 0) {
+        console.log(`📝 记录了 ${recordedCount} 条信息`);
+      } else {
+        console.log('ℹ️ 本次对话无新信息需要记录');
+      }
+    } else {
+      console.log('ℹ️ 本次对话无重要信息');
     }
   } catch (error) {
     console.error('记录记忆失败:', error);
@@ -177,11 +193,10 @@ export const organizeAndSummarizeLongTerm = async (): Promise<{ promoted: number
   return { promoted, summarized };
 };
 
-// 检查是否需要记录记忆（每1-3轮更新短期记忆）
+// 检查是否需要记录记忆（每轮都记录）
 export const shouldRecordMemory = (conversationRounds: number): boolean => {
-  // 每2轮记录一次，或50%概率随机记录
-  // 确保每1-3轮就有一次记录机会，且有去重逻辑避免重复
-  return conversationRounds % 2 === 0 || Math.random() > 0.5;
+  // 每轮都记录，去重逻辑在 recordConversationMemory 中处理
+  return true;
 };
 
 // 检查是否需要整理记忆

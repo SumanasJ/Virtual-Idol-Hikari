@@ -442,21 +442,6 @@ const App: React.FC = () => {
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
 
-    // 检测用户是否在纠正记忆
-    const correctionKeywords = ['不对', '不是这样', '错了', '不是', '不', '没有'];
-    const isCorrection = correctionKeywords.some(kw => input.trim().startsWith(kw) || input.includes(kw));
-
-    if (isCorrection && memory.facts.length > 0) {
-      const recentFacts = memory.facts.slice(-3);
-      const shouldCheckMemory = confirm(
-        `检测到你可能在纠正记忆。\n\n最近的记忆：\n${recentFacts.map(f => `• ${f.fact}`).join('\n')}\n\n是否需要纠正或删除这些记忆？\n\n点击"确定"查看记忆列表进行编辑，点击"取消"继续对话。`
-      );
-      if (shouldCheckMemory) {
-        setActiveTab('memory');
-        return;
-      }
-    }
-
     // 如果没有当前会话，创建新会话
     let sessionId = currentSessionId;
     if (!sessionId) {
@@ -560,10 +545,8 @@ const App: React.FC = () => {
       console.error('提取羁绊关系失败:', error);
     }
 
-    // 记录记忆到短期存储（每1-3轮一次）
-    if (shouldRecordMemory(nextRound)) {
-      await recordConversationMemory(currentInput, fullResponseText, simulatedTime);
-    }
+    // 记录记忆到短期存储（每轮都记录，去重逻辑在内部）
+    await recordConversationMemory(currentInput, fullResponseText, simulatedTime);
 
     // 重新加载记忆和关系（每次对话后都更新UI）
     const [updatedFacts, updatedRelations] = await Promise.all([
