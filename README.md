@@ -1,11 +1,69 @@
 # Hikari - 星野光 🌟
 
-一个基于 React + Google Gemini API 的虚拟偶像对话应用，让你的二次元梦想照进现实！
+> 一个基于 React + Google Gemini API 的虚拟偶像对话应用，让你的二次元梦想照进现实！
 
 ![Hikari Banner](https://img.shields.io/badge/Hikari-虚拟偶像-pink)
 ![React](https://img.shields.io/badge/React-19.2-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
 ![Vite](https://img.shields.io/badge/Vite-Latest-purple)
+![Version](https://img.shields.io/badge/v0.2.0-Hikari--0205-rose)
+
+---
+
+## 📸 功能截图
+
+### 对话界面
+![对话界面](https://via.placeholder.com/800x500/pink/white?text=聊天界面示例)
+
+### 记忆系统
+![记忆系统](https://via.placeholder.com/800x500/pink/white?text=光的小本本)
+
+### 羁绊图谱
+![羁绊图谱](https://via.placeholder.com/800x500/pink/white?text=羁绊图谱)
+
+### 贴纸库
+![贴纸库](https://via.placeholder.com/800x500/pink/white?text=贴纸库)
+
+---
+
+## 💬 对话示例
+
+**场景：刚打开应用，光主动关心**
+
+> **光**：呀吼~粉丝酱！好久不见啦，最近怎么样呀？有没有好好吃饭？光最近一直在想你呢~★
+
+**场景：聊到喜欢的音乐**
+
+> **粉丝君**：我最近喜欢听摇滚乐
+>
+> **光**：哇！摇滚超酷的！光也超喜欢摇滚呢~特别是那种吉他solo超燃的时候！粉丝君有没有特别喜欢的乐队呀？光最近在听 ONE OK ROCK，他们的歌真的超棒的！要不要推荐给你？
+
+**场景：分享美食**
+
+> **粉丝君**：今天吃了章鱼烧
+>
+> **光**：啊！章鱼烧！光的最爱~大阪的章鱼烧才是最正宗的！下次光带粉丝君去通天阁附近吃好不好？那里有一家超好吃的老店，外酥里嫩，章鱼超大只！说到这个光都饿了~😋
+
+**场景：离线后重新回来**
+
+> **光**：粉丝酱！你回来啦！光等了好久好久呢...你不在的时候光一直在听歌练习，还发现了一首超棒的新歌！而且...其实光有点想你了...下次不要离开这么久好不好？
+
+---
+
+## 🗂️ 版本存档
+
+- **[v0.2.0 - Hikari-0205](https://github.com/SumanasJ/virtual-idol-demo/tree/Hikari-0205)** (当前版本) - 📍 主分支
+  - 智能记忆系统（短期/长期自动管理）
+  - 羁绊图谱（每轮自动更新）
+  - 贴纸智能缓存（高复用率）
+  - 多会话管理与离线事件
+
+- **[legacy/old-version](https://github.com/SumanasJ/virtual-idol-demo/tree/legacy/old-version)** - 早期草稿版本（已存档）
+  - 第一代原型代码
+  - 基础对话功能
+  - 仅供历史参考，不再维护
+
+---
 
 ## ✨ 特色功能
 
